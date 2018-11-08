@@ -56,11 +56,13 @@ import java.util.ArrayList;
                 for(int i=0; i<earthquakesArray.length(); i++){
                     JSONObject currentEarthquake = earthquakesArray.getJSONObject(i);
                     JSONObject properties = currentEarthquake.getJSONObject("properties");
-                    String magnitude = properties.getString("mag");
+                    double magnitude = properties.getDouble("mag");
                     String location = properties.getString("place");
                     long time = properties.getLong("time");
+                    String url = properties.getString("url");
 
-                    earthquakes.add(new Earthquake(magnitude, location, time));
+
+                    earthquakes.add(new Earthquake(magnitude, location, time, url));
 
                     Log.v("QueryUtils", "JSON data successfully parsed");
                 }
