@@ -55,8 +55,8 @@ public class EarthquakeActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Earthquake quake = earthquakes.get(position);
-                Intent quakeBrowserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(quake.getEarthquakeUrl()));
-                startActivity(quakeBrowserIntent);
+                Intent quakeWebsiteIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(quake.getEarthquakeUrl()));
+                startActivity(quakeWebsiteIntent);
 
             }
         });
