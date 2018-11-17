@@ -1,34 +1,28 @@
 package com.example.android.quakereport;
 
-import android.app.Activity;
 import android.content.Context;
-import android.support.annotation.LayoutRes;
+import android.graphics.drawable.GradientDrawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
-import android.graphics.drawable.GradientDrawable;
-import android.support.v4.content.ContextCompat;
-
-import org.json.JSONObject;
 
 import java.text.DecimalFormat;
-import java.util.ArrayList;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.text.SimpleDateFormat;
 
 public class EarthquakeAdapter extends ArrayAdapter<Earthquake> {
 
     private static final String LOCATION_SEPARATOR = " of ";
 
-    public EarthquakeAdapter(Context context, List<Earthquake> earthquakes){
+    public EarthquakeAdapter(Context context, List<Earthquake> earthquakes) {
         super(context, 0, earthquakes);
     }
-
 
     @NonNull
     @Override
@@ -58,7 +52,7 @@ public class EarthquakeAdapter extends ArrayAdapter<Earthquake> {
         String primaryLocation;
         String locationOffset;
 
-        if(originalLocation.contains(LOCATION_SEPARATOR)) {
+        if (originalLocation.contains(LOCATION_SEPARATOR)) {
             String[] parts = originalLocation.split(LOCATION_SEPARATOR);
             locationOffset = parts[0] + LOCATION_SEPARATOR;
             primaryLocation = parts[1];
@@ -90,31 +84,31 @@ public class EarthquakeAdapter extends ArrayAdapter<Earthquake> {
         return listItemView;
     }
 
-    private String formatDate(Date dateObject){
+    private String formatDate(Date dateObject) {
         // Date will look like Jan 21, 2016
         SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy");
         return dateFormat.format(dateObject);
     }
 
-    private String formatTime(Date dateObject){
+    private String formatTime(Date dateObject) {
         // time format will look like 11:22 PM
         SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a");
         return timeFormat.format(dateObject);
 
     }
 
-    private String formatMagnitude (double magnitude){
+    private String formatMagnitude(double magnitude) {
         DecimalFormat magnitudeFormat = new DecimalFormat("0.0");
         return magnitudeFormat.format(magnitude);
     }
 
-    private int getMagnitudeColor(double magnitude){
+    private int getMagnitudeColor(double magnitude) {
         int magnitudeColorResourceId;
         // Use Math class to do some mathematical calculations. Take the "floor" of the decimal
         // magnitude value. This means finding the closest integer less than the decimal value.
         // The floor of the value 1.2 would be the integer 1.
         int magnitudeFloor = (int) Math.floor(magnitude);
-        switch (magnitudeFloor){
+        switch (magnitudeFloor) {
             case 0:
             case 1:
                 magnitudeColorResourceId = R.color.magnitude1;
@@ -143,9 +137,9 @@ public class EarthquakeAdapter extends ArrayAdapter<Earthquake> {
             case 9:
                 magnitudeColorResourceId = R.color.magnitude9;
                 break;
-                default:
-                    magnitudeColorResourceId = R.color.magnitude10plus;
-                    break;
+            default:
+                magnitudeColorResourceId = R.color.magnitude10plus;
+                break;
         }
 
         return ContextCompat.getColor(getContext(), magnitudeColorResourceId);
