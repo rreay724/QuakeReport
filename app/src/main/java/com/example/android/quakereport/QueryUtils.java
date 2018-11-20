@@ -52,6 +52,8 @@ public final class QueryUtils {
         // Extract relevant fields from the JSON response and create an {@link Event} object
         List<Earthquake> earthquakes = extractEarthquakes(jsonResponse);
 
+        Log.i("QueryUtils", "fetchEarthquakeData initialized");
+
         // Return the {@link Event}
         return earthquakes;
     }
