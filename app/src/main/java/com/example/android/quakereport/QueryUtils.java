@@ -41,6 +41,13 @@ public final class QueryUtils {
         // Create URL object
         URL url = createUrl(requestUrl);
 
+        // Use this code to test the progress bar. Will delay load time.
+//        try {
+//            Thread.sleep(2000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+
         // Perform HTTP request to the URL and receive a JSON response back
         String jsonResponse = null;
         try {

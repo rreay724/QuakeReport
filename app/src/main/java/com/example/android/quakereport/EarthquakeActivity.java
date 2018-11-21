@@ -19,6 +19,9 @@ import android.app.LoaderManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.content.AsyncTaskLoader;
@@ -27,6 +30,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -46,6 +50,7 @@ public class EarthquakeActivity extends AppCompatActivity
     public static final String TAG = "EarthquakeActivity";
     // TextView that is displayed when the list is empty
     private TextView mEmptyStateTextView;
+
 
 
     @Override
@@ -101,7 +106,18 @@ public class EarthquakeActivity extends AppCompatActivity
     @Override
     public void onLoadFinished(Loader<List<Earthquake>> loader, List<Earthquake> data) {
         // Set empty state text to display "No earthquakes found"
+
+        // This will add a progress bar to show the app is working if the internet connection
+        // is slow or if other factors are causing the app to take additional time to load
+        // the data
+        View progressBar = findViewById(R.id.progressBar);
+        progressBar.setVisibility(View.GONE);
+
+        // Set text for the empty view if there is no data to display
         mEmptyStateTextView.setText(R.string.no_earthquakes);
+
+        // Method defined below to set text if there is no internet connection
+        isOnline();
 
         // Clear the adapter of previous earthquake data
         mAdapter.clear();
@@ -111,6 +127,8 @@ public class EarthquakeActivity extends AppCompatActivity
         // data set. This will trigger the ListView to update.
         if (data != null && !data.isEmpty()) {
             mAdapter.addAll(data);
+
+
         }
     }
 
@@ -152,6 +170,19 @@ public class EarthquakeActivity extends AppCompatActivity
 
     }
 
+    /** Tests network or wifi connection and will set text in emptyTextView if there is no
+     *  internet connection **/
+    public boolean isOnline() {
+        ConnectivityManager mConnectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfoMobile = mConnectivityManager.getNetworkInfo(mConnectivityManager.TYPE_MOBILE);
+        NetworkInfo netInfoWifi = mConnectivityManager.getNetworkInfo(mConnectivityManager.TYPE_WIFI);
+        if (netInfoMobile == null || netInfoWifi == null) {
+            mEmptyStateTextView.setText(R.string.no_internet);
+            return false;
 
+        }
+        return true;
+
+    }
 
 }
