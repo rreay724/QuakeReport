@@ -16,21 +16,19 @@
 package com.example.android.quakereport;
 
 import android.app.LoaderManager;
+import android.content.AsyncTaskLoader;
 import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
 import android.net.ConnectivityManager;
-import android.net.Network;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
-import android.content.AsyncTaskLoader;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -52,11 +50,10 @@ public class EarthquakeActivity extends AppCompatActivity
     private TextView mEmptyStateTextView;
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.i(TAG, "onCreate: initialized");
-        
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.earthquake_activity);
 
@@ -73,6 +70,7 @@ public class EarthquakeActivity extends AppCompatActivity
         mEmptyStateTextView = (TextView) findViewById(R.id.emptyView);
         earthquakeListView.setEmptyView(mEmptyStateTextView);
 
+
         // Set OnItemClickListener and add an Intent to go to the URL of the specific
         // quake website on USGS website
         earthquakeListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -84,15 +82,28 @@ public class EarthquakeActivity extends AppCompatActivity
 
             }
         });
-        
-        // Get a reference to the LoaderManager in order to interact with loaders.
-        LoaderManager loaderManager = getLoaderManager();
-        
-        // Initialize the loader. Pass in the int ID constant defined above and pass in null 
-        // for the bundle. Pass in this activity for the LoaderCallbacks parameter (which is valid 
-        // because this activity implements the LoaderCallbacks interface.
-        Log.i(TAG, "onCreate: initloader initialized");
-        loaderManager.initLoader(EARTHQUAKE_LOADER_ID, null, this);
+
+        /**
+         * Tests network or wifi connection. If there is connection, the Loader will proceed as
+         * planned, if it is not connected, it will enter "no internet connection" in empty
+         * text view and set visibility of progress bar to gone.
+         **/
+        ConnectivityManager mConnectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = mConnectivityManager.getActiveNetworkInfo();
+        if (networkInfo != null && networkInfo.isConnected()) {
+            // Get a reference to the LoaderManager in order to interact with loaders.
+            LoaderManager loaderManager = getLoaderManager();
+            // Initialize the loader. Pass in the int ID constant defined above and pass in null
+            // for the bundle. Pass in this activity for the LoaderCallbacks parameter (which is valid
+            // because this activity implements the LoaderCallbacks interface.
+            Log.i(TAG, "onCreate: initloader initialized");
+            loaderManager.initLoader(EARTHQUAKE_LOADER_ID, null, this);
+        }else{
+            mEmptyStateTextView.setText(R.string.no_internet);
+            View progressBar = findViewById(R.id.progressBar);
+            progressBar.setVisibility(View.GONE);
+
+        }
 
     }
 
@@ -105,7 +116,9 @@ public class EarthquakeActivity extends AppCompatActivity
 
     @Override
     public void onLoadFinished(Loader<List<Earthquake>> loader, List<Earthquake> data) {
-        // Set empty state text to display "No earthquakes found"
+
+        // Method defined below to set text if there is no internet connection
+//        isOnline();
 
         // This will add a progress bar to show the app is working if the internet connection
         // is slow or if other factors are causing the app to take additional time to load
@@ -116,9 +129,6 @@ public class EarthquakeActivity extends AppCompatActivity
         // Set text for the empty view if there is no data to display
         mEmptyStateTextView.setText(R.string.no_earthquakes);
 
-        // Method defined below to set text if there is no internet connection
-        isOnline();
-
         // Clear the adapter of previous earthquake data
         mAdapter.clear();
         Log.i(TAG, "onLoadFinished: initialized");
@@ -127,8 +137,6 @@ public class EarthquakeActivity extends AppCompatActivity
         // data set. This will trigger the ListView to update.
         if (data != null && !data.isEmpty()) {
             mAdapter.addAll(data);
-
-
         }
     }
 
@@ -138,7 +146,7 @@ public class EarthquakeActivity extends AppCompatActivity
         Log.i(TAG, "onLoaderReset: initialized");
     }
 
-    public static class EarthquakeLoader extends AsyncTaskLoader<List<Earthquake>>{
+    public static class EarthquakeLoader extends AsyncTaskLoader<List<Earthquake>> {
 
         // Tag for log messages
         private final String LOG_TAG = EarthquakeLoader.class.getName();
@@ -146,7 +154,7 @@ public class EarthquakeActivity extends AppCompatActivity
         // Query URL
         private String mUrl;
 
-        public EarthquakeLoader(Context context, String url){
+        public EarthquakeLoader(Context context, String url) {
             super(context);
             mUrl = url;
         }
@@ -159,7 +167,7 @@ public class EarthquakeActivity extends AppCompatActivity
 
         @Override
         public List<Earthquake> loadInBackground() {
-            if (mUrl == null){
+            if (mUrl == null) {
                 Log.i(TAG, "loadInBackground: initialized");
                 return null;
             }
@@ -170,19 +178,7 @@ public class EarthquakeActivity extends AppCompatActivity
 
     }
 
-    /** Tests network or wifi connection and will set text in emptyTextView if there is no
-     *  internet connection **/
-    public boolean isOnline() {
-        ConnectivityManager mConnectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo netInfoMobile = mConnectivityManager.getNetworkInfo(mConnectivityManager.TYPE_MOBILE);
-        NetworkInfo netInfoWifi = mConnectivityManager.getNetworkInfo(mConnectivityManager.TYPE_WIFI);
-        if (netInfoMobile == null || netInfoWifi == null) {
-            mEmptyStateTextView.setText(R.string.no_internet);
-            return false;
 
-        }
-        return true;
 
-    }
 
 }
